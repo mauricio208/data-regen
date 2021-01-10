@@ -108,6 +108,8 @@ function createKPIObjectForSemiCorruptedData(entrie, matchMultiple) {
   }
 }
 
+
+
 async function getPowerBiData() {
   let blocks = await rcsv('blocks.csv');
   let regexExp = /.*\*.*/g;
@@ -123,15 +125,22 @@ async function getPowerBiData() {
     }
   }
   let powerBiDataRec=[];
-  for (const entrie of rcen) {
+  for (const entrie of recuperableEntries) {
     let kpiObject = createKPIObjectForSemiCorruptedData(entrie, true);
     if (kpiObject) {
       powerBiDataRec.push(kpiObject)
     }
   }
-  return {powerBiData, powerBiDataRec}
+  powerBiDataRec.sort();
+  let totalData = powerBiData.concat(powerBiDataRec)
+  totalData.sort((a,b)=>{
+    let aTime = Number(new Date(a.updatedAt));
+    let bTime = Number(new Date(b.updatedAt));
+    return bTime-aTime;
+  })
+  return totalData;
 }
 
 let gr;
-getPowerBiData.then(r=>{gr=r})
+getPowerBiData().then(r=>{gr=r})
 
